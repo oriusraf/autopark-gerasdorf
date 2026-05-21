@@ -497,7 +497,7 @@ const HomePage = ({ setView, openCar }) => {
               Alle ansehen <ArrowUpRight size={16} />
             </button>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
             {featured.map((car, i) => (
               <CarCard key={car.id} car={car} onClick={() => openCar(car)} delay={i} />
             ))}
@@ -625,34 +625,32 @@ const HomePage = ({ setView, openCar }) => {
 // ────────────────────────────────────────────────────────────────────────────
 const CarCard = ({ car, onClick, delay = 0 }) => (
   <div onClick={onClick}
-       className="group cursor-pointer bg-white border hover:shadow-2xl transition-all duration-300 anim-in"
+       className="group cursor-pointer bg-white border hover:shadow-2xl transition-all duration-300 anim-in flex sm:block"
        style={{ borderColor: C.line, animationDelay: `${delay * 0.08}s` }}>
-    <div className="relative overflow-hidden">
-      <CarPhoto car={car} size="md" className="group-hover:scale-105 transition-transform duration-700" />
-      <button className="absolute top-3 right-3 w-9 h-9 grid place-items-center bg-white/90 backdrop-blur hover:bg-white">
+    <div className="relative overflow-hidden w-32 flex-shrink-0 sm:w-auto">
+      <CarPhoto car={car} size="md" className="!h-full sm:!h-56 group-hover:scale-105 transition-transform duration-700" />
+      <button className="hidden sm:grid absolute top-3 right-3 w-9 h-9 place-items-center bg-white/90 backdrop-blur hover:bg-white">
         <Heart size={15} />
       </button>
     </div>
-    <div className="p-5">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex-1 min-w-0">
-          <div className="text-[10px] tracking-[0.15em] uppercase font-semibold" style={{ color: C.ink3 }}>{car.brand}</div>
-          <h3 className="font-display text-lg mt-0.5 leading-tight truncate" style={{ color: C.ink }}>{car.model}</h3>
+    <div className="p-3 sm:p-5 flex-1 min-w-0 flex flex-col justify-between">
+      <div>
+        <div className="text-[10px] tracking-[0.15em] uppercase font-semibold" style={{ color: C.ink3 }}>{car.brand}</div>
+        <h3 className="font-display text-sm sm:text-lg mt-0.5 leading-tight line-clamp-2 sm:truncate" style={{ color: C.ink }}>{car.model}</h3>
+        <div className="mt-2 sm:mt-4 flex flex-wrap sm:grid sm:grid-cols-2 gap-x-3 gap-y-1 sm:gap-y-2 text-[11px] sm:text-xs" style={{ color: C.ink2 }}>
+          <div className="flex items-center gap-1"><Calendar size={11} />{car.year}</div>
+          <div className="flex items-center gap-1"><Gauge size={11} />{fmtNum(car.km)} km</div>
+          <div className="hidden sm:flex items-center gap-1.5"><Fuel size={12} />{car.fuel}</div>
+          <div className="hidden sm:flex items-center gap-1.5"><Settings size={12} />{car.transmission}</div>
         </div>
       </div>
-      <div className="mt-4 grid grid-cols-2 gap-y-2 gap-x-3 text-xs" style={{ color: C.ink2 }}>
-        <div className="flex items-center gap-1.5"><Calendar size={12} />{car.year}</div>
-        <div className="flex items-center gap-1.5"><Gauge size={12} />{fmtNum(car.km)} km</div>
-        <div className="flex items-center gap-1.5"><Fuel size={12} />{car.fuel}</div>
-        <div className="flex items-center gap-1.5"><Settings size={12} />{car.transmission}</div>
-      </div>
-      <div className="mt-5 pt-4 border-t flex items-end justify-between" style={{ borderColor: C.line2 }}>
+      <div className="mt-3 sm:mt-5 sm:pt-4 sm:border-t flex items-end justify-between" style={{ borderColor: C.line2 }}>
         <div>
-          <div className="text-[10px] tracking-wider uppercase" style={{ color: C.ink3 }}>Preis</div>
-          <div className="font-display text-2xl leading-none mt-1" style={{ color: C.red }}>{fmtPrice(car.price)}</div>
+          <div className="hidden sm:block text-[10px] tracking-wider uppercase" style={{ color: C.ink3 }}>Preis</div>
+          <div className="font-display text-lg sm:text-2xl leading-none sm:mt-1" style={{ color: C.red }}>{fmtPrice(car.price)}</div>
         </div>
         <div className="text-xs font-semibold flex items-center gap-1 group-hover:gap-2 transition-all" style={{ color: C.ink }}>
-          Details <ArrowRight size={13} />
+          <span className="hidden sm:inline">Details</span> <ArrowRight size={13} />
         </div>
       </div>
     </div>
@@ -845,7 +843,7 @@ const ListingsPage = ({ openCar }) => {
                 <p style={{ color: C.ink2 }}>Keine Fahrzeuge mit diesen Filtern gefunden.</p>
               </div>
             ) : (
-              <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6">
                 {cars.map((car, i) => <CarCard key={car.id} car={car} onClick={() => openCar(car)} delay={i} />)}
               </div>
             )}
