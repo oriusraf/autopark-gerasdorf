@@ -225,6 +225,7 @@ const fmtNum = (n) => new Intl.NumberFormat('de-AT').format(n);
 // HEADER
 // ────────────────────────────────────────────────────────────────────────────
 const Header = ({ view, setView }) => {
+  const [mobileOpen, setMobileOpen] = useState(false);
   const nav = [
     { id: 'home', label: 'Startseite' },
     { id: 'listings', label: 'Fahrzeuge' },
@@ -232,16 +233,18 @@ const Header = ({ view, setView }) => {
     { id: 'services', label: 'Leistungen' },
     { id: 'contact', label: 'Kontakt' },
   ];
+  const go = (id) => { setView(id); setMobileOpen(false); };
+
   return (
     <>
-      <div className="border-b text-[12px]" style={{ background: C.ink, color: '#D8D6D0', borderColor: 'transparent' }}>
-        <div className="max-w-7xl mx-auto px-6 py-2 flex items-center justify-between">
-          <div className="flex items-center gap-5">
-            <div className="flex items-center gap-1.5"><Phone size={12} /><span>+43 660 123 45 67</span></div>
+      <div className="border-b text-[11px] sm:text-[12px]" style={{ background: C.ink, color: '#D8D6D0', borderColor: 'transparent' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 sm:gap-5 min-w-0">
+            <a href="tel:+436601234567" className="flex items-center gap-1.5 shrink-0"><Phone size={12} /><span>+43 660 123 45 67</span></a>
             <div className="hidden md:flex items-center gap-1.5"><Mail size={12} /><span>office@autopark-gerasdorf.at</span></div>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-1.5"><MapPin size={12} /><span>Brünner Straße 71-73, 2201 Gerasdorf</span></div>
+          <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+            <div className="hidden lg:flex items-center gap-1.5"><MapPin size={12} /><span>Brünner Straße 71-73, 2201 Gerasdorf</span></div>
             <div className="flex items-center gap-2.5">
               <Facebook size={13} className="cursor-pointer hover:text-white" />
               <Instagram size={13} className="cursor-pointer hover:text-white" />
@@ -250,8 +253,8 @@ const Header = ({ view, setView }) => {
         </div>
       </div>
       <header className="sticky top-0 z-30 border-b backdrop-blur-md" style={{ borderColor: C.line, background: 'rgba(248,246,241,0.92)' }}>
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <button onClick={() => setView('home')} className="flex items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
+          <button onClick={() => go('home')} className="flex items-center">
             <Logo size="md" />
           </button>
           <nav className="hidden lg:flex items-center gap-1">
@@ -264,15 +267,55 @@ const Header = ({ view, setView }) => {
               </button>
             ))}
           </nav>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button onClick={() => setView('listings')}
                     className="hidden md:flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white transition-all hover:opacity-90"
                     style={{ background: C.red }}>
               Fahrzeuge ansehen <ArrowRight size={14} />
             </button>
+            <button onClick={() => setMobileOpen(true)} aria-label="Menü öffnen"
+                    className="lg:hidden w-11 h-11 grid place-items-center border" style={{ borderColor: C.line, color: C.ink }}>
+              <Menu size={20} />
+            </button>
           </div>
         </div>
       </header>
+
+      {/* MOBILE DRAWER */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setMobileOpen(false)} />
+          <div className="absolute right-0 top-0 bottom-0 w-[85%] max-w-sm flex flex-col shadow-2xl" style={{ background: C.surface }}>
+            <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: C.line }}>
+              <Logo size="sm" />
+              <button onClick={() => setMobileOpen(false)} aria-label="Menü schließen"
+                      className="w-10 h-10 grid place-items-center" style={{ color: C.ink }}>
+                <X size={22} />
+              </button>
+            </div>
+            <nav className="flex-1 overflow-y-auto py-2">
+              {nav.map(n => (
+                <button key={n.id} onClick={() => go(n.id)}
+                        className="w-full text-left px-5 py-4 text-base font-medium border-b flex items-center justify-between"
+                        style={{ borderColor: C.line2, color: view === n.id ? C.red : C.ink }}>
+                  {n.label}
+                  {view === n.id && <span className="w-1.5 h-1.5 rounded-full" style={{ background: C.red }} />}
+                </button>
+              ))}
+              <button onClick={() => go('listings')}
+                      className="mx-5 mt-6 mb-4 px-5 py-3.5 text-sm font-semibold text-white flex items-center justify-center gap-2 w-[calc(100%-2.5rem)]"
+                      style={{ background: C.red }}>
+                Fahrzeuge ansehen <ArrowRight size={14} />
+              </button>
+            </nav>
+            <div className="border-t px-5 py-4 text-[12px] space-y-2" style={{ borderColor: C.line, color: C.ink2 }}>
+              <a href="tel:+436601234567" className="flex items-center gap-2"><Phone size={13} style={{ color: C.red }} />+43 660 123 45 67</a>
+              <a href="mailto:office@autopark-gerasdorf.at" className="flex items-center gap-2"><Mail size={13} style={{ color: C.red }} />office@autopark-gerasdorf.at</a>
+              <div className="flex items-start gap-2"><MapPin size={13} style={{ color: C.red }} className="mt-0.5" /><span>Brünner Straße 71-73<br/>2201 Gerasdorf</span></div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
@@ -347,30 +390,30 @@ const HomePage = ({ setView, openCar }) => {
         <div className="absolute inset-0 opacity-[0.04]" style={{
           backgroundImage: `radial-gradient(circle at 20% 30%, ${C.red} 0%, transparent 40%), radial-gradient(circle at 80% 70%, ${C.ink} 0%, transparent 50%)`
         }} />
-        <div className="max-w-7xl mx-auto px-6 py-20 lg:py-28 relative">
-          <div className="grid lg:grid-cols-12 gap-12 items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-20 lg:py-28 relative">
+          <div className="grid lg:grid-cols-12 gap-10 lg:gap-12 items-center">
             <div className="lg:col-span-7 anim-in">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 mb-6 border" style={{ borderColor: C.line, background: C.surface }}>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 mb-5 sm:mb-6 border" style={{ borderColor: C.line, background: C.surface }}>
                 <span className="w-2 h-2 rounded-full" style={{ background: C.red }} />
-                <span className="text-xs tracking-[0.18em] uppercase font-semibold" style={{ color: C.ink2 }}>
+                <span className="text-[11px] sm:text-xs tracking-[0.18em] uppercase font-semibold" style={{ color: C.ink2 }}>
                   Seit 2023 · Familiengeführt
                 </span>
               </div>
-              <h1 className="font-display text-5xl lg:text-7xl leading-[1.05] tracking-tight" style={{ color: C.ink }}>
+              <h1 className="font-display text-4xl sm:text-5xl lg:text-7xl leading-[1.05] tracking-tight" style={{ color: C.ink }}>
                 Ihr Fahrzeug.<br />
                 <span className="italic" style={{ color: C.red }}>Mit Vertrauen</span> gewählt.
               </h1>
-              <p className="mt-7 text-lg leading-relaxed max-w-xl" style={{ color: C.ink2 }}>
+              <p className="mt-6 sm:mt-7 text-base sm:text-lg leading-relaxed max-w-xl" style={{ color: C.ink2 }}>
                 Hochwertige Gebrauchtwagen, persönliche Beratung und faire Finanzierung – in Gerasdorf bei Wien. Sorgfältig geprüfte Fahrzeuge mit §57a-Pickerl und Gewährleistung.
               </p>
-              <div className="mt-9 flex flex-wrap gap-4">
+              <div className="mt-8 sm:mt-9 flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4">
                 <button onClick={() => setView('listings')}
-                        className="px-7 py-4 text-sm font-semibold tracking-wide text-white inline-flex items-center gap-2 transition-all hover:gap-3"
+                        className="px-6 sm:px-7 py-3.5 sm:py-4 text-sm font-semibold tracking-wide text-white inline-flex items-center justify-center gap-2 transition-all hover:gap-3"
                         style={{ background: C.ink }}>
                   Aktuelle Fahrzeuge entdecken <ArrowRight size={16} />
                 </button>
                 <button onClick={() => setView('contact')}
-                        className="px-7 py-4 text-sm font-semibold tracking-wide inline-flex items-center gap-2 border-2"
+                        className="px-6 sm:px-7 py-3.5 sm:py-4 text-sm font-semibold tracking-wide inline-flex items-center justify-center gap-2 border-2"
                         style={{ borderColor: C.ink, color: C.ink }}>
                   Termin vereinbaren
                 </button>
@@ -387,15 +430,23 @@ const HomePage = ({ setView, openCar }) => {
             <div className="lg:col-span-5 anim-in anim-delay-2">
               <div className="relative">
                 <CarPhoto car={highlight} size="xl" className="shadow-2xl" />
-                <div className="absolute -bottom-6 -left-6 bg-white p-5 shadow-xl border" style={{ borderColor: C.line }}>
+                <div className="hidden sm:block absolute -bottom-6 -left-6 bg-white p-5 shadow-xl border" style={{ borderColor: C.line }}>
                   <div className="text-xs tracking-[0.18em] uppercase mb-1" style={{ color: C.ink3 }}>Aktuelles Highlight</div>
                   <div className="font-display text-xl" style={{ color: C.ink }}>{highlight.brand} {highlight.model.split(' ').slice(0, 2).join(' ')}</div>
                   <div className="text-lg font-semibold mt-1" style={{ color: C.red }}>{fmtPrice(highlight.price)}</div>
                 </div>
-                <div className="absolute -top-4 -right-4 bg-white px-4 py-3 shadow-xl border" style={{ borderColor: C.line }}>
+                <div className="hidden sm:block absolute -top-4 -right-4 bg-white px-4 py-3 shadow-xl border" style={{ borderColor: C.line }}>
                   <div className="flex items-center gap-2">
                     <Award size={18} style={{ color: C.gold }} />
                     <div className="text-xs font-semibold" style={{ color: C.ink }}>Geprüfter<br/>Händler</div>
+                  </div>
+                </div>
+                {/* mobile inline highlight info */}
+                <div className="sm:hidden mt-4 bg-white p-4 border" style={{ borderColor: C.line }}>
+                  <div className="text-[11px] tracking-[0.18em] uppercase" style={{ color: C.ink3 }}>Aktuelles Highlight</div>
+                  <div className="mt-1 flex items-baseline justify-between gap-3">
+                    <div className="font-display text-lg" style={{ color: C.ink }}>{highlight.brand} {highlight.model.split(' ').slice(0, 2).join(' ')}</div>
+                    <div className="font-semibold" style={{ color: C.red }}>{fmtPrice(highlight.price)}</div>
                   </div>
                 </div>
               </div>
@@ -435,12 +486,12 @@ const HomePage = ({ setView, openCar }) => {
       </section>
 
       {/* FEATURED CARS */}
-      <section className="py-20" style={{ background: C.surface }}>
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-end justify-between mb-12">
+      <section className="py-16 sm:py-20" style={{ background: C.surface }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex flex-wrap items-end justify-between gap-4 mb-10 sm:mb-12">
             <div>
               <div className="text-xs tracking-[0.2em] uppercase font-semibold mb-3" style={{ color: C.red }}>Aktuelle Highlights</div>
-              <h2 className="font-display text-4xl lg:text-5xl" style={{ color: C.ink }}>Empfohlene Fahrzeuge</h2>
+              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl" style={{ color: C.ink }}>Empfohlene Fahrzeuge</h2>
             </div>
             <button onClick={() => setView('listings')} className="hidden md:flex items-center gap-2 text-sm font-semibold tracking-wide" style={{ color: C.ink }}>
               Alle ansehen <ArrowUpRight size={16} />
@@ -455,11 +506,11 @@ const HomePage = ({ setView, openCar }) => {
       </section>
 
       {/* SERVICES STRIP */}
-      <section className="py-20" style={{ background: C.bg }}>
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-14">
+      <section className="py-16 sm:py-20" style={{ background: C.bg }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-10 sm:mb-14">
             <div className="text-xs tracking-[0.2em] uppercase font-semibold mb-3" style={{ color: C.red }}>Unsere Leistungen</div>
-            <h2 className="font-display text-4xl lg:text-5xl" style={{ color: C.ink }}>Alles aus einer Hand</h2>
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl" style={{ color: C.ink }}>Alles aus einer Hand</h2>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
@@ -481,12 +532,12 @@ const HomePage = ({ setView, openCar }) => {
       </section>
 
       {/* ABOUT / TRUST */}
-      <section className="py-20" style={{ background: C.surface }}>
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+      <section className="py-16 sm:py-20" style={{ background: C.surface }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <div>
               <div className="text-xs tracking-[0.2em] uppercase font-semibold mb-3" style={{ color: C.red }}>Über uns</div>
-              <h2 className="font-display text-4xl lg:text-5xl mb-6" style={{ color: C.ink }}>
+              <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl mb-6" style={{ color: C.ink }}>
                 Persönlich. Ehrlich. <span className="italic">Verlässlich.</span>
               </h2>
               <p className="text-lg leading-relaxed mb-5" style={{ color: C.ink2 }}>
@@ -526,7 +577,7 @@ const HomePage = ({ setView, openCar }) => {
                   <div className="mt-3 text-xs tracking-[0.2em] uppercase" style={{ color: C.ink3 }}>Team-Foto</div>
                 </div>
               </div>
-              <div className="absolute bottom-8 -left-8 bg-white p-6 shadow-xl border max-w-xs" style={{ borderColor: C.line }}>
+              <div className="mt-4 lg:mt-0 lg:absolute lg:bottom-8 lg:-left-8 bg-white p-5 sm:p-6 shadow-xl border lg:max-w-xs" style={{ borderColor: C.line }}>
                 <div className="flex gap-1 mb-2">
                   {[...Array(5)].map((_,i)=><Star key={i} size={14} fill={C.gold} stroke="none" />)}
                 </div>
@@ -541,13 +592,13 @@ const HomePage = ({ setView, openCar }) => {
       </section>
 
       {/* CONTACT CTA */}
-      <section className="py-20" style={{ background: C.ink }}>
-        <div className="max-w-5xl mx-auto px-6 text-center">
+      <section className="py-16 sm:py-20" style={{ background: C.ink }}>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center">
           <div className="text-xs tracking-[0.2em] uppercase font-semibold mb-3" style={{ color: C.red }}>Besuchen Sie uns</div>
-          <h2 className="font-display text-4xl lg:text-5xl text-white mb-5">
+          <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl text-white mb-5">
             Persönlich. Vor Ort. <span className="italic" style={{ color: C.gold }}>In Gerasdorf.</span>
           </h2>
-          <p className="text-lg max-w-2xl mx-auto mb-10" style={{ color: '#B8BAC2' }}>
+          <p className="text-base sm:text-lg max-w-2xl mx-auto mb-8 sm:mb-10" style={{ color: '#B8BAC2' }}>
             Wir freuen uns auf Ihren Besuch. Vereinbaren Sie gerne einen Termin – oder schauen Sie spontan vorbei.
           </p>
           <div className="grid md:grid-cols-3 gap-5 max-w-3xl mx-auto">
@@ -614,7 +665,13 @@ const CarCard = ({ car, onClick, delay = 0 }) => (
 const ListingsPage = ({ openCar }) => {
   const [filters, setFilters] = useState({ brand: 'Alle', fuel: 'Alle', body: 'Alle', maxPrice: 50000 });
   const [sort, setSort] = useState('newest');
-  const [showFilters, setShowFilters] = useState(true);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
+  const activeFilterCount =
+    (filters.brand !== 'Alle' ? 1 : 0) +
+    (filters.fuel !== 'Alle' ? 1 : 0) +
+    (filters.body !== 'Alle' ? 1 : 0) +
+    (filters.maxPrice < 50000 ? 1 : 0);
 
   let cars = SAMPLE_CARS.filter(c => c.status !== 'verkauft');
   if (filters.brand !== 'Alle') cars = cars.filter(c => c.brand === filters.brand);
@@ -634,19 +691,95 @@ const ListingsPage = ({ openCar }) => {
     <div style={{ background: C.bg }}>
       {/* Page header */}
       <div className="border-b" style={{ background: C.surface, borderColor: C.line }}>
-        <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
           <div className="text-xs tracking-[0.2em] uppercase font-semibold mb-3" style={{ color: C.red }}>Unser Bestand</div>
-          <h1 className="font-display text-5xl" style={{ color: C.ink }}>Aktuelle Fahrzeuge</h1>
-          <p className="mt-4 text-lg max-w-2xl" style={{ color: C.ink2 }}>
+          <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl" style={{ color: C.ink }}>Aktuelle Fahrzeuge</h1>
+          <p className="mt-3 sm:mt-4 text-base sm:text-lg max-w-2xl" style={{ color: C.ink2 }}>
             {cars.length} Fahrzeuge geprüft und sofort verfügbar. Persönliche Besichtigung jederzeit nach Terminvereinbarung möglich.
           </p>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-10">
+      {/* Mobile filter trigger */}
+      <div className="lg:hidden sticky top-16 sm:top-20 z-20 border-b" style={{ background: C.surface, borderColor: C.line }}>
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
+          <button onClick={() => setMobileFiltersOpen(true)}
+                  className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold border flex-1 justify-center"
+                  style={{ borderColor: C.ink, color: C.ink }}>
+            <Filter size={15} /> Filter
+            {activeFilterCount > 0 && (
+              <span className="ml-1 px-1.5 py-0.5 text-[10px] font-bold text-white rounded-full" style={{ background: C.red }}>
+                {activeFilterCount}
+              </span>
+            )}
+          </button>
+          <select value={sort} onChange={e => setSort(e.target.value)} className="text-sm px-3 py-2.5 border flex-1" style={{ borderColor: C.line }}>
+            <option value="newest">Neueste</option>
+            <option value="price-asc">Preis ↑</option>
+            <option value="price-desc">Preis ↓</option>
+            <option value="km-asc">Kilometer ↑</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Mobile filter drawer */}
+      {mobileFiltersOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setMobileFiltersOpen(false)} />
+          <div className="absolute right-0 top-0 bottom-0 w-[90%] max-w-sm flex flex-col shadow-2xl" style={{ background: C.surface }}>
+            <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: C.line }}>
+              <h3 className="font-display text-lg flex items-center gap-2" style={{ color: C.ink }}>
+                <Filter size={16} /> Filter
+              </h3>
+              <button onClick={() => setMobileFiltersOpen(false)} className="w-10 h-10 grid place-items-center" style={{ color: C.ink }}>
+                <X size={20} />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-5 py-5">
+              {[
+                { key: 'brand', label: 'Marke', opts: brands },
+                { key: 'body', label: 'Karosserie', opts: bodies },
+                { key: 'fuel', label: 'Kraftstoff', opts: fuels },
+              ].map(f => (
+                <div key={f.key} className="mb-5">
+                  <label className="text-[11px] tracking-[0.15em] uppercase font-semibold block mb-2" style={{ color: C.ink3 }}>{f.label}</label>
+                  <div className="space-y-1.5">
+                    {f.opts.map(o => (
+                      <label key={o} className="flex items-center gap-2 cursor-pointer text-sm py-1">
+                        <input type="radio" checked={filters[f.key] === o}
+                               onChange={() => setFilters({ ...filters, [f.key]: o })}
+                               style={{ accentColor: C.red }} />
+                        <span style={{ color: C.ink2 }}>{o}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              <div>
+                <label className="text-[11px] tracking-[0.15em] uppercase font-semibold block mb-2" style={{ color: C.ink3 }}>Preis bis {fmtPrice(filters.maxPrice)}</label>
+                <input type="range" min="5000" max="50000" step="1000" value={filters.maxPrice}
+                       onChange={e => setFilters({ ...filters, maxPrice: parseInt(e.target.value) })}
+                       className="w-full" style={{ accentColor: C.red }} />
+              </div>
+            </div>
+            <div className="border-t p-4 grid grid-cols-2 gap-3" style={{ borderColor: C.line }}>
+              <button onClick={() => setFilters({ brand: 'Alle', fuel: 'Alle', body: 'Alle', maxPrice: 50000 })}
+                      className="py-3 text-sm font-semibold border" style={{ borderColor: C.ink, color: C.ink }}>
+                Zurücksetzen
+              </button>
+              <button onClick={() => setMobileFiltersOpen(false)}
+                      className="py-3 text-sm font-semibold text-white" style={{ background: C.red }}>
+                {cars.length} Auto{cars.length === 1 ? '' : 's'} zeigen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
         <div className="grid lg:grid-cols-[280px_1fr] gap-8">
-          {/* FILTERS */}
-          <aside className="space-y-6">
+          {/* FILTERS (desktop) */}
+          <aside className="space-y-6 hidden lg:block">
             <div className="bg-white border p-6" style={{ borderColor: C.line }}>
               <div className="flex items-center justify-between mb-5">
                 <h3 className="font-display text-lg flex items-center gap-2" style={{ color: C.ink }}>
@@ -691,7 +824,7 @@ const ListingsPage = ({ openCar }) => {
 
           {/* RESULTS */}
           <main>
-            <div className="bg-white border p-4 mb-6 flex items-center justify-between flex-wrap gap-3" style={{ borderColor: C.line }}>
+            <div className="hidden lg:flex bg-white border p-4 mb-6 items-center justify-between flex-wrap gap-3" style={{ borderColor: C.line }}>
               <div className="text-sm" style={{ color: C.ink2 }}><strong style={{ color: C.ink }}>{cars.length}</strong> Fahrzeuge gefunden</div>
               <div className="flex items-center gap-2">
                 <span className="text-xs tracking-wider uppercase" style={{ color: C.ink3 }}>Sortieren:</span>
@@ -702,6 +835,9 @@ const ListingsPage = ({ openCar }) => {
                   <option value="km-asc">Kilometerstand</option>
                 </select>
               </div>
+            </div>
+            <div className="lg:hidden mb-4 text-sm" style={{ color: C.ink2 }}>
+              <strong style={{ color: C.ink }}>{cars.length}</strong> Fahrzeuge
             </div>
             {cars.length === 0 ? (
               <div className="bg-white border p-12 text-center" style={{ borderColor: C.line }}>
@@ -899,6 +1035,12 @@ const AdminPanel = ({ exitAdmin }) => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [section, setSection] = useState('dashboard');
   const [editingCar, setEditingCar] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const sectionLabel = {
+    dashboard: 'Dashboard', inventory: 'Inserate', new: 'Neues Inserat',
+    inquiries: 'Anfragen', settings: 'Einstellungen', edit: 'Bearbeiten',
+  }[section] || 'Admin';
 
   if (!loggedIn) {
     return (
@@ -932,48 +1074,84 @@ const AdminPanel = ({ exitAdmin }) => {
     );
   }
 
-  return (
-    <div className="min-h-screen flex" style={{ background: C.bg }}>
-      {/* SIDEBAR */}
-      <aside className="w-64 flex-shrink-0 flex flex-col" style={{ background: C.ink }}>
-        <div className="p-4 border-b" style={{ borderColor: '#2A2D39' }}>
-          <div className="bg-white px-3 py-2.5 flex items-center justify-center">
-            <Logo size="sm" />
-          </div>
-          <div className="text-[10px] tracking-[0.2em] uppercase font-semibold mt-3 px-2" style={{ color: C.red }}>Admin-Panel</div>
+  const navItems = [
+    { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
+    { id: 'inventory', icon: List, label: 'Inserate' },
+    { id: 'new', icon: Plus, label: 'Neues Inserat' },
+    { id: 'inquiries', icon: Mail, label: 'Anfragen' },
+    { id: 'settings', icon: Settings, label: 'Einstellungen' },
+  ];
+
+  const SidebarContent = ({ onSelect }) => (
+    <>
+      <div className="p-4 border-b" style={{ borderColor: '#2A2D39' }}>
+        <div className="bg-white px-3 py-2.5 flex items-center justify-center">
+          <Logo size="sm" />
         </div>
-        <nav className="flex-1 p-4 space-y-1">
-          {[
-            { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-            { id: 'inventory', icon: List, label: 'Inserate' },
-            { id: 'new', icon: Plus, label: 'Neues Inserat' },
-            { id: 'inquiries', icon: Mail, label: 'Anfragen' },
-            { id: 'settings', icon: Settings, label: 'Einstellungen' },
-          ].map(item => (
-            <button key={item.id} onClick={() => { setSection(item.id); setEditingCar(null); }}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-colors"
-                    style={{ background: section === item.id ? C.red : 'transparent', color: '#D8D6D0' }}>
-              <item.icon size={16} />{item.label}
-            </button>
-          ))}
-        </nav>
-        <div className="p-4 border-t" style={{ borderColor: '#2A2D39' }}>
-          <div className="flex items-center gap-3 mb-3 px-2">
-            <div className="w-9 h-9 rounded-full grid place-items-center text-white text-sm font-display" style={{ background: C.red }}>DP</div>
-            <div className="text-xs">
-              <div className="text-white font-semibold">Danijel Pajkovic</div>
-              <div style={{ color: '#8A8E9A' }}>Inhaber</div>
-            </div>
-          </div>
-          <button onClick={exitAdmin} className="w-full flex items-center justify-center gap-2 py-2 text-xs border" style={{ color: '#D8D6D0', borderColor: '#2A2D39' }}>
-            <LogOut size={13} /> Zur Website
+        <div className="text-[10px] tracking-[0.2em] uppercase font-semibold mt-3 px-2" style={{ color: C.red }}>Admin-Panel</div>
+      </div>
+      <nav className="flex-1 p-4 space-y-1">
+        {navItems.map(item => (
+          <button key={item.id}
+                  onClick={() => { setSection(item.id); setEditingCar(null); onSelect && onSelect(); }}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 text-sm transition-colors"
+                  style={{ background: section === item.id ? C.red : 'transparent', color: '#D8D6D0' }}>
+            <item.icon size={16} />{item.label}
           </button>
+        ))}
+      </nav>
+      <div className="p-4 border-t" style={{ borderColor: '#2A2D39' }}>
+        <div className="flex items-center gap-3 mb-3 px-2">
+          <div className="w-9 h-9 rounded-full grid place-items-center text-white text-sm font-display" style={{ background: C.red }}>DP</div>
+          <div className="text-xs">
+            <div className="text-white font-semibold">Danijel Pajkovic</div>
+            <div style={{ color: '#8A8E9A' }}>Inhaber</div>
+          </div>
         </div>
+        <button onClick={exitAdmin} className="w-full flex items-center justify-center gap-2 py-2 text-xs border" style={{ color: '#D8D6D0', borderColor: '#2A2D39' }}>
+          <LogOut size={13} /> Zur Website
+        </button>
+      </div>
+    </>
+  );
+
+  return (
+    <div className="min-h-screen lg:flex" style={{ background: C.bg }}>
+      {/* DESKTOP SIDEBAR */}
+      <aside className="hidden lg:flex w-64 flex-shrink-0 flex-col" style={{ background: C.ink }}>
+        <SidebarContent />
       </aside>
+
+      {/* MOBILE TOP BAR */}
+      <div className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 border-b" style={{ background: C.ink, borderColor: '#2A2D39' }}>
+        <button onClick={() => setSidebarOpen(true)} aria-label="Menü öffnen"
+                className="w-10 h-10 grid place-items-center" style={{ color: '#D8D6D0' }}>
+          <Menu size={20} />
+        </button>
+        <div className="text-sm font-semibold text-white">{sectionLabel}</div>
+        <button onClick={exitAdmin} aria-label="Zur Website"
+                className="w-10 h-10 grid place-items-center" style={{ color: '#D8D6D0' }}>
+          <LogOut size={16} />
+        </button>
+      </div>
+
+      {/* MOBILE DRAWER */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setSidebarOpen(false)} />
+          <aside className="absolute left-0 top-0 bottom-0 w-[80%] max-w-xs flex flex-col shadow-2xl" style={{ background: C.ink }}>
+            <button onClick={() => setSidebarOpen(false)} aria-label="Menü schließen"
+                    className="absolute top-3 right-3 w-9 h-9 grid place-items-center z-10" style={{ color: '#D8D6D0' }}>
+              <X size={20} />
+            </button>
+            <SidebarContent onSelect={() => setSidebarOpen(false)} />
+          </aside>
+        </div>
+      )}
 
       {/* MAIN */}
       <main className="flex-1 overflow-auto">
-        <div className="px-10 py-8">
+        <div className="px-4 sm:px-6 lg:px-10 py-6 lg:py-8">
           {section === 'dashboard' && <AdminDashboard setSection={setSection} />}
           {section === 'inventory' && <AdminInventory setSection={setSection} setEditingCar={setEditingCar} />}
           {section === 'new' && <AdminCarForm car={null} setSection={setSection} />}
@@ -988,9 +1166,9 @@ const AdminPanel = ({ exitAdmin }) => {
 
 const AdminDashboard = ({ setSection }) => (
   <div>
-    <div className="flex items-end justify-between mb-8">
+    <div className="flex flex-wrap items-end justify-between gap-4 mb-6 sm:mb-8">
       <div>
-        <h1 className="font-display text-3xl" style={{ color: C.ink }}>Willkommen zurück, Danijel</h1>
+        <h1 className="font-display text-2xl sm:text-3xl" style={{ color: C.ink }}>Willkommen zurück, Danijel</h1>
         <p className="text-sm mt-1" style={{ color: C.ink2 }}>Hier ist Ihre Übersicht für heute, 16. Mai 2026.</p>
       </div>
       <button onClick={() => setSection('new')} className="px-5 py-2.5 text-sm font-semibold text-white flex items-center gap-2" style={{ background: C.red }}>
@@ -998,7 +1176,7 @@ const AdminDashboard = ({ setSection }) => (
       </button>
     </div>
 
-    <div className="grid md:grid-cols-4 gap-5 mb-8">
+    <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-5 mb-8">
       {[
         { icon: Car, label: 'Aktive Inserate', value: '12', change: '+2 diese Woche', color: C.ink },
         { icon: Eye, label: 'Aufrufe (30 Tage)', value: '8.426', change: '+24%', color: C.red },
@@ -1080,9 +1258,9 @@ const AdminInventory = ({ setSection, setEditingCar }) => {
 
   return (
     <div>
-      <div className="flex items-end justify-between mb-8">
+      <div className="flex flex-wrap items-end justify-between gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="font-display text-3xl" style={{ color: C.ink }}>Inserate verwalten</h1>
+          <h1 className="font-display text-2xl sm:text-3xl" style={{ color: C.ink }}>Inserate verwalten</h1>
           <p className="text-sm mt-1" style={{ color: C.ink2 }}>{SAMPLE_CARS.length} Fahrzeuge insgesamt im System</p>
         </div>
         <button onClick={() => setSection('new')} className="px-5 py-2.5 text-sm font-semibold text-white flex items-center gap-2" style={{ background: C.red }}>
